@@ -76,7 +76,8 @@
 
         <!-- Sidebar Content -->
         <div class="flex-1 overflow-y-auto px-4 py-6 space-y-7">
-            <!-- User Info Summary -->
+            <!-- User Info Summary / Guest Options -->
+            @auth
             <div class="flex items-center gap-3 px-2">
                 <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-800 flex items-center justify-center border border-zinc-700 font-bold text-zinc-200 shadow-inner">
                     {{ substr(Auth::user()->name ?? 'U', 0, 2) }}
@@ -88,17 +89,29 @@
                     </span>
                 </div>
             </div>
+            @endauth
+            @guest
+            <div class="px-3 py-4 bg-zinc-950/40 border border-zinc-800/50 rounded-2xl text-center space-y-3">
+                <p class="text-2xs text-zinc-400">Join SolveSphere to ask questions and post solutions!</p>
+                <div class="flex gap-2">
+                    <a href="{{ route('login') }}" class="flex-1 text-center py-2 px-2 bg-zinc-800 hover:bg-zinc-750 text-white rounded-xl text-xs font-semibold border border-zinc-700/50 transition-colors">Sign In</a>
+                    <a href="{{ route('register') }}" class="flex-1 text-center py-2 px-2 bg-gradient-to-r from-violet-600 to-indigo-500 hover:from-violet-500 hover:to-indigo-400 text-white rounded-xl text-xs font-semibold shadow-md transition-colors">Sign Up</a>
+                </div>
+            </div>
+            @endguest
 
             <!-- Main Menu -->
             <div>
                 <span class="px-3 text-3xs font-semibold tracking-wider text-zinc-500 uppercase block mb-3">Platform</span>
                 <nav class="space-y-1">
+                    @auth
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('dashboard') ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
                         </svg>
                         Dashboard
                     </a>
+                    @endauth
                     <a href="{{ route('problems.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('problems.index') || request()->routeIs('problems.show') ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -111,17 +124,19 @@
                         </svg>
                         Ask a Question
                     </a>
+                    @auth
                     <a href="{{ route('profile.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all {{ request()->routeIs('profile.index') ? 'bg-zinc-800 text-white shadow-sm border border-zinc-700/50' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40 border border-transparent' }}">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                         Profile Settings
                     </a>
+                    @endauth
                 </nav>
             </div>
 
             <!-- Admin Menu -->
-            @if(Auth::user()->isAdmin())
+            @if(Auth::check() && Auth::user()->isAdmin())
             <div>
                 <span class="px-3 text-3xs font-semibold tracking-wider text-indigo-400 uppercase block mb-3">Admin Console</span>
                 <nav class="space-y-1">
@@ -154,6 +169,7 @@
             @endif
         </div>
 
+        @auth
         <!-- Logout Section -->
         <div class="p-4 border-t border-zinc-800 shrink-0">
             <form action="{{ route('logout') }}" method="POST" class="m-0">
@@ -166,6 +182,7 @@
                 </button>
             </form>
         </div>
+        @endauth
     </aside>
 
     <!-- Overlay backdrops for mobile sidebar -->
