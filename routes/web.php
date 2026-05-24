@@ -13,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/explore', [ProblemController::class, 'index'])->name('problems.index');
 Route::get('/problems/{id}', [ProblemController::class, 'show'])->name('problems.show');
+Route::get('/seed-database', function() {
+    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    return 'Database seeded successfully!';
+});
 
 // 2. Guest-only Routes
 Route::middleware('guest')->group(function () {
