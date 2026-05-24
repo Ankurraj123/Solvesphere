@@ -37,14 +37,22 @@ class ProblemController extends Controller
         }
 
         $problems = $query->latest()->paginate(9)->withQueryString();
-        $categories = Category::all();
+        $categories = Category::orderBy('name', 'asc')->get();
+        $other = $categories->firstWhere('name', 'Other');
+        if ($other) {
+            $categories = $categories->reject(fn($c) => $c->name === 'Other')->push($other);
+        }
 
         return view('problems.index', compact('problems', 'categories'));
     }
 
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::orderBy('name', 'asc')->get();
+        $other = $categories->firstWhere('name', 'Other');
+        if ($other) {
+            $categories = $categories->reject(fn($c) => $c->name === 'Other')->push($other);
+        }
         return view('problems.create', compact('categories'));
     }
 
@@ -100,7 +108,11 @@ class ProblemController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $categories = Category::all();
+        $categories = Category::orderBy('name', 'asc')->get();
+        $other = $categories->firstWhere('name', 'Other');
+        if ($other) {
+            $categories = $categories->reject(fn($c) => $c->name === 'Other')->push($other);
+        }
         return view('problems.edit', compact('problem', 'categories'));
     }
 
