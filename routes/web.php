@@ -14,6 +14,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/explore', [ProblemController::class, 'index'])->name('problems.index');
 Route::get('/problems/{id}', [ProblemController::class, 'show'])->name('problems.show');
 Route::get('/seed-database', function() {
+    // 1. Clear categories, problems, and answers to clean up any duplicates/broken entries
+    \App\Models\Category::truncate();
+    \App\Models\Problem::truncate();
+    \App\Models\Answer::truncate();
+
+    // 2. Re-create categories cleanly
     $categories = [
         ['name' => 'DSA', 'description' => 'Data Structures and Algorithms problems, including arrays, trees, graphs, and dynamic programming.'],
         ['name' => 'Operating Systems', 'description' => 'Threads, CPU scheduling, memory management, file systems, and system calls.'],
@@ -25,10 +31,10 @@ Route::get('/seed-database', function() {
     ];
 
     foreach ($categories as $cat) {
-        \App\Models\Category::firstOrCreate(['name' => $cat['name']], $cat);
+        \App\Models\Category::create($cat);
     }
 
-    return 'Database seeded with extra categories successfully!';
+    return 'Database reset and categories seeded cleanly!';
 });
 
 // 2. Guest-only Routes
