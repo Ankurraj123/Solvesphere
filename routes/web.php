@@ -14,8 +14,21 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/explore', [ProblemController::class, 'index'])->name('problems.index');
 Route::get('/problems/{id}', [ProblemController::class, 'show'])->name('problems.show');
 Route::get('/seed-database', function() {
-    \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-    return 'Database seeded successfully!';
+    $categories = [
+        ['name' => 'DSA', 'description' => 'Data Structures and Algorithms problems, including arrays, trees, graphs, and dynamic programming.'],
+        ['name' => 'Operating Systems', 'description' => 'Threads, CPU scheduling, memory management, file systems, and system calls.'],
+        ['name' => 'DBMS', 'description' => 'Database design, SQL queries, normalization, indexing, and transaction management.'],
+        ['name' => 'Web Development', 'description' => 'Frontend styling, backend frameworks, REST APIs, state management, and cloud deployments.'],
+        ['name' => 'Networking', 'description' => 'OSI model layers, TCP/IP handshake, routing protocols, subnets, and network security.'],
+        ['name' => 'Laravel', 'description' => 'Laravel MVC framework, Eloquent ORM, routing, middleware, and backend logic.'],
+        ['name' => 'Other', 'description' => 'General computer science, programming questions, and off-topic technical discussions.'],
+    ];
+
+    foreach ($categories as $cat) {
+        \App\Models\Category::firstOrCreate(['name' => $cat['name']], $cat);
+    }
+
+    return 'Database seeded with extra categories successfully!';
 });
 
 // 2. Guest-only Routes

@@ -64,6 +64,16 @@ class DatabaseSeeder extends Seeder
             'description' => 'OSI model layers, TCP/IP handshake, routing protocols, subnets, and network security.',
         ]);
 
+        $laravel = Category::create([
+            'name' => 'Laravel',
+            'description' => 'Laravel MVC framework, Eloquent ORM, routing, middleware, and backend logic.',
+        ]);
+
+        $other = Category::create([
+            'name' => 'Other',
+            'description' => 'General computer science, programming questions, and off-topic technical discussions.',
+        ]);
+
         // 3. Seed Problems
         $prob1 = Problem::create([
             'user_id' => $user1->id,
