@@ -15,9 +15,15 @@ Route::get('/explore', [ProblemController::class, 'index'])->name('problems.inde
 Route::get('/problems/{id}', [ProblemController::class, 'show'])->name('problems.show');
 Route::get('/seed-database', function() {
     // 1. Clear categories, problems, and answers to clean up any duplicates/broken entries
-    \App\Models\Category::truncate();
-    \App\Models\Problem::truncate();
-    \App\Models\Answer::truncate();
+    try {
+        \App\Models\Category::query()->delete();
+        \App\Models\Problem::query()->delete();
+        \App\Models\Answer::query()->delete();
+    } catch (\Exception $e) {
+        foreach (\App\Models\Category::all() as $c) { $c->delete(); }
+        foreach (\App\Models\Problem::all() as $p) { $p->delete(); }
+        foreach (\App\Models\Answer::all() as $a) { $a->delete(); }
+    }
 
     // 2. Re-create categories cleanly
     $categories = [
