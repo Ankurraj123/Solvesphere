@@ -25,14 +25,18 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Data for Categories and their counts
+        $categoriesData = Category::with('problems')->get()->map(function ($category) {
+            $category->problems_count = $category->problems->count();
+            return $category;
+        });
+
         // Trending categories
-        $trendingCategories = Category::withCount('problems')
-            ->orderBy('problems_count', 'desc')
-            ->limit(4)
-            ->get();
+        $trendingCategories = $categoriesData
+            ->sortByDesc('problems_count')
+            ->take(4);
 
         // Data for ApexCharts (Problems per Category distribution)
-        $categoriesData = Category::withCount('problems')->get();
         $chartCategories = $categoriesData->pluck('name')->toArray();
         $chartData = $categoriesData->pluck('problems_count')->toArray();
 
