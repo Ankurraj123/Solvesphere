@@ -69,16 +69,7 @@ class ProblemController extends Controller
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
-            // Ensure directory exists
-            $destinationPath = public_path('uploads/problems');
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true, true);
-            }
-            
-            $image->move($destinationPath, $filename);
-            $imagePath = 'uploads/problems/' . $filename;
+            $imagePath = 'data:' . $image->getMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
         }
 
         Problem::create([
@@ -104,7 +95,7 @@ class ProblemController extends Controller
         $problem = Problem::findOrFail($id);
 
         // Authorize: check if owner or admin
-        if (Auth::id() !== $problem->user_id && !Auth::user()->isAdmin()) {
+        if ((string) Auth::id() !== (string) $problem->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -121,7 +112,7 @@ class ProblemController extends Controller
         $problem = Problem::findOrFail($id);
 
         // Authorize: check if owner or admin
-        if (Auth::id() !== $problem->user_id && !Auth::user()->isAdmin()) {
+        if ((string) Auth::id() !== (string) $problem->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -135,21 +126,13 @@ class ProblemController extends Controller
         $imagePath = $problem->image;
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($problem->image && File::exists(public_path($problem->image))) {
+            // Delete old image if exists (only if it is a local file path)
+            if ($problem->image && !str_starts_with($problem->image, 'data:') && File::exists(public_path($problem->image))) {
                 File::delete(public_path($problem->image));
             }
 
             $image = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-            
-            $destinationPath = public_path('uploads/problems');
-            if (!File::exists($destinationPath)) {
-                File::makeDirectory($destinationPath, 0755, true, true);
-            }
-
-            $image->move($destinationPath, $filename);
-            $imagePath = 'uploads/problems/' . $filename;
+            $imagePath = 'data:' . $image->getMimeType() . ';base64,' . base64_encode(file_get_contents($image->getRealPath()));
         }
 
         $problem->update([
@@ -167,12 +150,12 @@ class ProblemController extends Controller
         $problem = Problem::findOrFail($id);
 
         // Authorize: check if owner or admin
-        if (Auth::id() !== $problem->user_id && !Auth::user()->isAdmin()) {
+        if ((string) Auth::id() !== (string) $problem->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Delete associated image
-        if ($problem->image && File::exists(public_path($problem->image))) {
+        // Delete associated image if it is a local file path
+        if ($problem->image && !str_starts_with($problem->image, 'data:') && File::exists(public_path($problem->image))) {
             File::delete(public_path($problem->image));
         }
 
@@ -186,7 +169,7 @@ class ProblemController extends Controller
         $problem = Problem::findOrFail($id);
 
         // Authorize: only owner can mark as solved
-        if (Auth::id() !== $problem->user_id) {
+        if ((string) Auth::id() !== (string) $problem->user_id) {
             abort(403, 'Unauthorized action.');
         }
 

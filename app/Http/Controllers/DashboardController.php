@@ -14,9 +14,9 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // User stats
-        $totalQuestions = Problem::where('user_id', $user->id)->count();
-        $totalAnswers = Answer::where('user_id', $user->id)->count();
-        $solvedQuestions = Problem::where('user_id', $user->id)->where('status', 'solved')->count();
+        $totalQuestions = Problem::where('user_id', (string) $user->id)->count();
+        $totalAnswers = Answer::where('user_id', (string) $user->id)->count();
+        $solvedQuestions = Problem::where('user_id', (string) $user->id)->where('status', 'solved')->count();
         $solvedRate = $totalQuestions > 0 ? round(($solvedQuestions / $totalQuestions) * 100) : 0;
 
         // Recent activity feed: latest problems in the community

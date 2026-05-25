@@ -32,7 +32,7 @@ class AnswerController extends Controller
         $answer = Answer::findOrFail($id);
 
         // Authorize: only owner can edit answer
-        if (Auth::id() !== $answer->user_id) {
+        if ((string) Auth::id() !== (string) $answer->user_id) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -52,7 +52,7 @@ class AnswerController extends Controller
         $answer = Answer::findOrFail($id);
 
         // Authorize: owner or admin
-        if (Auth::id() !== $answer->user_id && !Auth::user()->isAdmin()) {
+        if ((string) Auth::id() !== (string) $answer->user_id && !Auth::user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 

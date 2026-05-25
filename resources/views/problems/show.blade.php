@@ -37,7 +37,7 @@
                     </span>
 
                     <!-- Mark as Solved (Owner only) -->
-                    @if(Auth::check() && Auth::id() === $problem->user_id)
+                    @if(Auth::check() && (string) Auth::id() === (string) $problem->user_id)
                         <form action="{{ route('problems.solved', $problem->id) }}" method="POST" class="m-0">
                             @csrf
                             <button type="submit" class="px-3.5 py-1.5 rounded-xl text-2xs font-semibold border cursor-pointer transition-all {{ $problem->isSolved() ? 'bg-zinc-800 hover:bg-zinc-750 text-zinc-400 border-zinc-700 hover:text-white' : 'bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border-emerald-500/20 hover:border-emerald-500 shadow-md shadow-emerald-500/5' }}">
@@ -62,16 +62,16 @@
             @if($problem->image)
                 <div class="bg-zinc-950 p-4 border border-zinc-800 rounded-xl overflow-hidden shadow-inner max-w-2xl">
                     <p class="text-3xs text-zinc-500 uppercase font-semibold mb-3">Attached Screenshot:</p>
-                    <a href="{{ asset($problem->image) }}" target="_blank">
-                        <img src="{{ asset($problem->image) }}" class="rounded-lg max-h-96 w-auto object-contain hover:opacity-90 transition-opacity" alt="Problem Screenshot">
+                    <a href="{{ str_starts_with($problem->image, 'data:') ? $problem->image : asset($problem->image) }}" target="_blank">
+                        <img src="{{ str_starts_with($problem->image, 'data:') ? $problem->image : asset($problem->image) }}" class="rounded-lg max-h-96 w-auto object-contain hover:opacity-90 transition-opacity" alt="Problem Screenshot">
                     </a>
                 </div>
             @endif
 
             <!-- Moderation / Editing Tools -->
-            @if(Auth::check() && (Auth::id() === $problem->user_id || Auth::user()->isAdmin()))
+            @if(Auth::check() && ((string) Auth::id() === (string) $problem->user_id || Auth::user()->isAdmin()))
                 <div class="flex items-center gap-3 pt-6 border-t border-zinc-800/80">
-                    @if(Auth::id() === $problem->user_id || Auth::user()->isAdmin())
+                    @if((string) Auth::id() === (string) $problem->user_id || Auth::user()->isAdmin())
                         <a href="{{ route('problems.edit', $problem->id) }}" class="inline-flex items-center gap-1.5 px-4.5 py-2 rounded-xl text-xs font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-750 border border-zinc-750 transition-colors">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             Edit
@@ -112,7 +112,7 @@
                                     <div>
                                         <h4 class="text-xs font-semibold text-white leading-tight">
                                             {{ $ans->user->name }}
-                                            @if($ans->user_id === $problem->user_id)
+                                            @if((string) $ans->user_id === (string) $problem->user_id)
                                                 <span class="ml-1 text-4xs bg-violet-500/10 text-violet-400 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider border border-violet-500/15">Owner</span>
                                             @endif
                                         </h4>
@@ -121,9 +121,9 @@
                                 </div>
 
                                 <!-- Modify Buttons for Answer Owner or Admin -->
-                                @if(Auth::check() && (Auth::id() === $ans->user_id || Auth::user()->isAdmin()))
+                                @if(Auth::check() && ((string) Auth::id() === (string) $ans->user_id || Auth::user()->isAdmin()))
                                     <div class="flex items-center gap-2">
-                                        @if(Auth::id() === $ans->user_id)
+                                        @if((string) Auth::id() === (string) $ans->user_id)
                                             <button type="button" onclick="toggleEditAnswer({{ $ans->id }})" class="p-1.5 text-zinc-550 hover:text-white rounded-lg hover:bg-zinc-800 transition-colors" title="Edit answer">
                                                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                             </button>
@@ -145,7 +145,7 @@
                             </div>
 
                             <!-- Inline Edit Form (Hidden by default) -->
-                            @if(Auth::check() && Auth::id() === $ans->user_id)
+                            @if(Auth::check() && (string) Auth::id() === (string) $ans->user_id)
                                 <form id="answer-edit-form-{{ $ans->id }}" action="{{ route('answers.update', $ans->id) }}" method="POST" class="hidden space-y-3 mt-4 pt-4 border-t border-zinc-800/40">
                                     @csrf
                                     @method('PUT')

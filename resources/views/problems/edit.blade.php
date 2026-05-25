@@ -58,7 +58,7 @@
                 @if($problem->image)
                     <div class="mb-4 bg-zinc-950 p-4 border border-zinc-800 rounded-xl relative max-w-sm">
                         <p class="text-3xs text-zinc-500 uppercase font-semibold mb-2 block">Current attachment:</p>
-                        <img src="{{ asset($problem->image) }}" class="rounded-lg max-h-40 w-auto" alt="Current image">
+                        <img src="{{ str_starts_with($problem->image, 'data:') ? $problem->image : asset($problem->image) }}" class="rounded-lg max-h-40 w-auto" alt="Current image">
                     </div>
                 @endif
 
