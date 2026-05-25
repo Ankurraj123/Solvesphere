@@ -20,12 +20,18 @@ class AdminController extends Controller
         ];
 
         // ApexCharts data: Users distribution by Role
-        $roleCounts = User::groupBy('role')->selectRaw('role, count(*) as count')->pluck('count', 'role')->toArray();
+        $roleCounts = [
+            'admin' => User::where('role', 'admin')->count(),
+            'user' => User::where('role', 'user')->orWhereNull('role')->orWhere('role', '')->count(),
+        ];
         $chartRoles = array_keys($roleCounts);
         $chartRoleData = array_values($roleCounts);
 
         // ApexCharts data: Problems per category
-        $categoryData = Category::withCount('problems')->get();
+        $categoryData = Category::all()->map(function ($category) {
+            $category->problems_count = Problem::where('category_id', $category->id)->count();
+            return $category;
+        });
         $chartCategories = $categoryData->pluck('name')->toArray();
         $chartCategoryProblems = $categoryData->pluck('problems_count')->toArray();
 
@@ -50,7 +56,10 @@ class AdminController extends Controller
 
     public function categories()
     {
-        $categories = Category::withCount('problems')->get();
+        $categories = Category::all()->map(function ($category) {
+            $category->problems_count = Problem::where('category_id', $category->id)->count();
+            return $category;
+        });
         return view('admin.categories', compact('categories'));
     }
 
@@ -96,7 +105,11 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::withCount(['problems', 'answers'])->get();
+        $users = User::all()->map(function ($user) {
+            $user->problems_count = Problem::where('user_id', (string) $user->id)->count();
+            $user->answers_count = Answer::where('user_id', (string) $user->id)->count();
+            return $user;
+        });
         return view('admin.users', compact('users'));
     }
 
